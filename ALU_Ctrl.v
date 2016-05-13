@@ -30,9 +30,9 @@ reg        [4-1:0] ALUCtrl_o;
 //Select exact operation
 always @ (*) begin
   case (ALUOp_i)
-	 3'b000: ALUCtrl_o = 4'd2; //add :for addi
-    3'b001: ALUCtrl_o = 4'd6; //sub :for beq
-    3'b010: 
+	 3'd0: ALUCtrl_o = 4'd2; //add :for addi
+    3'd1: ALUCtrl_o = 4'd6; //sub :for beq
+    3'd2:
       case (funct_i)//R-type
 			 6'd24: ALUCtrl_o = 4'd3;//Mul 
 			 6'd36: ALUCtrl_o = 4'd0; //R-type AND
@@ -44,11 +44,11 @@ always @ (*) begin
           6'd7: ALUCtrl_o = 4'd11; // SRA V ??
           default:   ALUCtrl_o = 4'bxxxx;
       endcase
-    3'b011: ALUCtrl_o = 4'd8; //BNE ?
-    3'b100: ALUCtrl_o = 4'd7;	//slti
-	 3'b101: ALUCtrl_o = 4'd14;	//lui 
-    3'b110: ALUCtrl_o = 4'd1;	//ori
-	 3'b111:	ALUCtrl_o <= 4'd13;//slti u
+			//3'd3: ALUCtrl_o = 4'd8; //BNE ?
+    3'd4: ALUCtrl_o = 4'd7;	//slti
+	 3'd5: ALUCtrl_o = 4'd14;	//lui 
+    3'd6: ALUCtrl_o = 4'd1;	//ori
+	 3'd7:	ALUCtrl_o <= 4'd13;//slti u
     default: ALUCtrl_o = 4'bxxxx;
   endcase
 end
