@@ -32,7 +32,8 @@ reg    [32-1:0]  result_o;
 wire             zero_o;
 
 //Parameter
-assign zero_o = (ctrl_i==8)?(result_o!=0):(result_o==0);
+		//? assign zero_o = (ctrl_i==8)?(result_o!=0):(result_o==0);
+assign zero_o = (result_o==0);
 //Main function
 always @(ctrl_i, src1_i, src2_i) begin
    case(ctrl_i)
@@ -42,7 +43,7 @@ always @(ctrl_i, src1_i, src2_i) begin
 		3: result_o <= src1_i * src2_i;
 		6: result_o <= src1_i - src2_i;
 		7: result_o <= src1_i < src2_i ? 1:0;
-		8: result_o <= src1_i - src2_i;//BRANCH ON NOT EQUAL
+				//8: result_o <= src1_i - src2_i;//BRANCH ON NOT EQUAL
 		9: result_o <= ($signed(src2_i) >>> shamt);//SRA
 		11:result_o <= ($signed(src2_i) >>> $signed(src1_i));//SRA V 
 		12: result_o <= ~(src1_i | src2_i);
