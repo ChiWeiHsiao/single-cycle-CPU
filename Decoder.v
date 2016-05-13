@@ -73,7 +73,17 @@ always @(*) begin
 				MemWrite_o = ;
 				MemtoReg_o = 2'b;
 		  end
-		  
+		  6'b000010: begin // jump
+				RegWrite_o = ;
+				ALU_op_o = 3'b;
+            ALUSrc_o = ;
+            RegDst_o = ;
+            Branch_o = ;
+				Jump_o = ;
+				MemRead_o = ;
+				MemWrite_o = ;
+				MemtoReg_o = 2'b;
+		  end
 //====================================
         6'd0: begin // R-type
             RegWrite_o = 1;
