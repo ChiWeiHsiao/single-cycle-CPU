@@ -30,6 +30,7 @@ wire	[32-1:0] instr;	//32-bit the instruction to conduct
 wire	[3-1:0] 	ALU_op;
 wire	RegWrite, ALUSrc, RegDst, Branch, Jump, MemRead, MemWrite;
 wire	[1:0] MemtoReg;
+wire	[1:0] BranchType;
 //Register File
 wire	[5-1:0] 	write_reg;//input of RF, output of MUX_reg_write
 wire	[32-1:0]	read_data_1;
@@ -94,6 +95,7 @@ Decoder Decoder(	//OP code, first 6 bits of instruction
 	    .ALUSrc_o(ALUSrc),   
 	    .RegDst_o(RegDst),   
 		 .Branch_o(Branch),
+		 .BranchType_o(BranchType),
 		 .Jump_o(Jump),
 		 .MemRead_o(MemRead),
 		 .MemWrite_o(MemWrite),
@@ -144,7 +146,6 @@ MUX_3to1 #(.size(32)) Mux_Reg_Source(
         .data_o(Reg_data_i)
         );	
 //?
-
 Adder Adder2(	//PC Branch
         .src1_i(pc_add_4),     
 	    .src2_i(pc_shift_left_2),     
@@ -155,8 +156,16 @@ Shift_Left_Two_32 Shifter(
         .data_i(constant),
         .data_o(pc_shift_left_2)
         ); 		
-		
-assign Mux_PC_Source_select = Branch & ALUZero;
+
+wire Branch_Type_o;
+Branch_Type Branch_or_not(
+	 .branch_type_i(BranchType),
+    .alu_result_sign_bit_i(ALU_result[31]),
+	 .alu_zero_i(ALUZero),
+	 .branch_or_not_o(Branch_Type_o)
+	 );
+
+assign Mux_PC_Source_select = Branch & Branch_Type_o;
 
 wire	[32-1:0]	pc1_data_o;
 MUX_2to1 #(.size(32)) Mux_PC_Source1(
@@ -165,7 +174,13 @@ MUX_2to1 #(.size(32)) Mux_PC_Source1(
         .select_i(Mux_PC_Source_select),
         .data_o(pc1_data_o)
         );	 
-		  
+
+wire [27:0] jump_shift_left_o;
+Shift_Left_Two_28 Shifter_Jump(
+        .data_i(instr[25:0]),
+        .data_o(jump_shift_left_o)
+        ); 		
+
 wire	[32-1:0]	pc2_jump;
 MUX_2to1 #(.size(32)) Mux_PC_Source2(
         .data0_i(pc2_jump),
