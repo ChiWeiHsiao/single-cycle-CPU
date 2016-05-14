@@ -20,8 +20,7 @@ input         clk_i;
 input         rst_i;
 //Internal Signles
 //PC
-wire	[32-1:0] pc_in;	//PC
-wire	[32-1:0] pc_out;	//PC
+wire	[32-1:0] pc_in, pc_out;
 wire	[32-1:0] pc_add_4;	//output of Adder1
 wire	[32-1:0] pc_branch;	//output of Adder2
 wire	[32-1:0] pc_shift_left_2;//output of shift_left_2,input of Adder2
@@ -47,7 +46,7 @@ wire	ALUZero;
 //Mux_PC_Source
 wire Mux_PC_Source_select;
 //Data_Memory
-wire DM_data_o;
+wire	[32-1:0]	DM_data_o;
 
 
 //Greate componentes
@@ -65,7 +64,7 @@ Adder Adder1(	//PC add 4
 	    );
 	
 Instr_Memory IM(
-        .pc_addr_i(pc_out),  
+        .addr_i(pc_out),  
 	    .instr_o(instr)    
 	    );
 
@@ -129,7 +128,7 @@ ALU ALU(
 		.zero_o(ALUZero)
 	    );
 //?		 
-Data_Memory(
+Data_Memory Data_Memory(
 		.clk_i(clk_i),
 		.addr_i(ALU_result),
 		.data_i(read_data_2),
@@ -158,6 +157,7 @@ Shift_Left_Two_32 Shifter(
         ); 		
 
 wire Branch_Type_o;
+
 Branch_Type Branch_or_not(
 	 .branch_type_i(BranchType),
     .alu_result_sign_bit_i(ALU_result[31]),
@@ -168,6 +168,7 @@ Branch_Type Branch_or_not(
 assign Mux_PC_Source_select = Branch & Branch_Type_o;
 
 wire	[32-1:0]	pc1_data_o;
+
 MUX_2to1 #(.size(32)) Mux_PC_Source1(
         .data0_i(pc_add_4),
         .data1_i(pc_branch),
@@ -176,18 +177,23 @@ MUX_2to1 #(.size(32)) Mux_PC_Source1(
         );	 
 
 wire [27:0] jump_shift_left_o;
+
 Shift_Left_Two_28 Shifter_Jump(
         .data_i(instr[25:0]),
         .data_o(jump_shift_left_o)
         ); 		
+		  
+wire [32-1:0] JumpAddress;
+assign JumpAddress = {pc_add_4[31:28], jump_shift_left_o[27:0]};
 
-wire	[32-1:0]	pc2_jump;
 MUX_2to1 #(.size(32)) Mux_PC_Source2(
-        .data0_i(pc2_jump),
-        .data1_i(pc1_data_o),
+        .data0_i(pc1_data_o),
+        .data1_i(JumpAddress),
         .select_i(Jump),
         .data_o(pc_in)
         );	 
 		  
 endmodule
+		  
+
 
