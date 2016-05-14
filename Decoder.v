@@ -89,6 +89,19 @@ always @(*) begin
 				MemWrite_o = 0;
 				MemtoReg_o = 2'bxx;
 		  end
+		  //since li can be replaced by addi, 3to1 MUX is no need
+		  6'd15: begin // li(load immediate), can replace with addi
+            RegWrite_o = 1;            
+				ALU_op_o = 3'b000;
+            ALUSrc_o = 1;
+            RegDst_o = 0;
+            Branch_o = 0;
+				BranchType_o = 2'bxx;
+				Jump_o = 0;
+				MemRead_o = 0;
+				MemWrite_o = 0;
+				MemtoReg_o = 2'b00;
+        end
 		  6'd6: begin // ble <=
             RegWrite_o = 0;
 				ALU_op_o = 3'b001;
